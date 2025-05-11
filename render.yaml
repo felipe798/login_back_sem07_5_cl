@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: node-jwt-auth-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_HOST
+        value: dpg-d0fvhma4d50c73famuqg-a
+      - key: DB_USER
+        value: root
+      - key: DB_PASSWORD
+        value: ctMZ2CcjXdg9ti7CVaGlC9LZKGS4CEXA
+      - key: DB_NAME
+        value: sem07_db
+      - key: DB_PORT
+        value: 5432
+      - key: DB_DIALECT
+        value: postgres
+      - key: JWT_SECRET
+        generateValue: true
