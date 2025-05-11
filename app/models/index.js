@@ -1,3 +1,9 @@
+// app/models/index.js
+import { Sequelize } from "sequelize";
+import { DB_CONFIG } from "../config/db.config.js";
+import userModel from "./user.model.js";
+import roleModel from "./role.model.js";
+
 const sequelize = new Sequelize(
   DB_CONFIG.DB,
   DB_CONFIG.USER,
@@ -9,7 +15,7 @@ const sequelize = new Sequelize(
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false // Necesario para algunas configuraciones de Render
+        rejectUnauthorized: false
       }
     },
     pool: {
@@ -20,3 +26,29 @@ const sequelize = new Sequelize(
     }
   }
 );
+
+const db = {};
+
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+db.user = userModel(sequelize, Sequelize);
+db.role = roleModel(sequelize, Sequelize);
+
+// Definir relación muchos a muchos entre User y Role
+db.role.belongsToMany(db.user, {
+  through: "user_roles",
+  foreignKey: "roleId",
+  otherKey: "userId"
+});
+
+db.user.belongsToMany(db.role, {
+  through: "user_roles",
+  foreignKey: "userId",
+  otherKey: "roleId"
+});
+
+db.ROLES = ["user", "admin", "moderator"];
+
+// Cambiar esto para usar export default
+export default db;
