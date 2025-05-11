@@ -5,16 +5,10 @@ import dotenv from "dotenv";
 import db from "./app/models/index.js";
 import authRoutes from "./app/routes/auth.routes.js";
 import userRoutes from "./app/routes/user.routes.js";
-import path from "path";
-import { fileURLToPath } from "url";
 import bcrypt from "bcryptjs";
 
 // Configurar dotenv
 dotenv.config();
-
-// Obtener el directorio actual
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -38,9 +32,6 @@ app.use(cors(corsOptions));
 // Parsear solicitudes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Servir archivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Función para inicializar roles y usuario admin
 async function initial() {
@@ -101,7 +92,7 @@ db.sequelize.sync().then(() => {
   console.error("Error al sincronizar la base de datos:", err);
 });
 
-// Rutas de la API - IMPORTANTE: estas deben definirse ANTES de la ruta catch-all
+// Rutas de la API
 authRoutes(app);
 userRoutes(app);
 
@@ -119,9 +110,12 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-// Ruta para el frontend (debe ir después de todas las rutas API)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Manejar todas las rutas no encontradas
+app.use((req, res) => {
+  res.status(404).json({ 
+    message: "Ruta no encontrada", 
+    path: req.path 
+  });
 });
 
 const PORT = process.env.PORT || 8080;
